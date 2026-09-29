@@ -1,0 +1,850 @@
+openapi: 3.1.0
+info:
+  title: Коллектор — локальный демонстрационный API
+  version: '2026-09-29'
+  description: Описание текущего server.py. Внешние заявки и реестр — заглушки; ограничения по object_id
+    не реализованы. Общие детали и ограничения в API.md.
+servers:
+- url: http://127.0.0.1:8080
+paths:
+  /health:
+    get:
+      summary: Доступность и историческая дата прогноза
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': &id001
+          description: Ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/me:
+    get:
+      summary: Текущая сессия и права
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+  /api/login:
+    post:
+      summary: Вход с cookie и CSRF
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+  /api/logout:
+    post:
+      summary: Выход из сессии
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Empty'
+  /api/forecasts:
+    get:
+      summary: Исторический снимок прогнозов
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: forecasts:read. Для POST нужен X-CSRF-Token.'
+  /api/objects:
+    get:
+      summary: Активный реестр объектов
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: objects:read. Для POST нужен X-CSRF-Token.'
+    post:
+      summary: Добавить локальный объект
+      responses:
+        '201':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: objects:write. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectCreate'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/equipment:
+    get:
+      summary: Каналы и локальное оборудование
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: objects:read. Для POST нужен X-CSRF-Token.'
+      parameters:
+      - name: object_id
+        in: query
+        required: true
+        description: ''
+        schema:
+          type: integer
+      - name: system
+        in: query
+        required: false
+        description: ''
+        schema:
+          type: string
+      - name: q
+        in: query
+        required: false
+        description: ''
+        schema:
+          type: string
+    post:
+      summary: Добавить локальное оборудование
+      responses:
+        '201':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: equipment:write. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EquipmentCreate'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/metrics:
+    get:
+      summary: Исторические метрики
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: reports:read. Для POST нужен X-CSRF-Token.'
+  /api/decisions:
+    get:
+      summary: Последние 200 решений
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: decisions:write. Для POST нужен X-CSRF-Token.'
+    post:
+      summary: Записать решение
+      responses:
+        '201':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: decisions:write. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DecisionCreate'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/notifications:
+    get:
+      summary: Последние 200 оповещений
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: notifications:read. Для POST нужен X-CSRF-Token.'
+  /api/notifications/{id}/ack:
+    post:
+      summary: Отметить просмотр
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: notifications:ack. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Empty'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+  /api/tickets/{id}:
+    get:
+      summary: Локальный черновик и заглушка внешнего статуса
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: tickets:read. Для POST нужен X-CSRF-Token.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+  /api/tickets/drafts:
+    post:
+      summary: Создать локальный черновик
+      responses:
+        '201':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: tickets:write. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketDraft'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/tickets/{id}/confirm:
+    post:
+      summary: Подтвердить локально человеком
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+        '404': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: tickets:write. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Confirmation'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+  /api/stream:
+    get:
+      summary: Состояние исторического воспроизведения
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: stream:write. Для POST нужен X-CSRF-Token.'
+  /api/stream/events:
+    get:
+      summary: Последние 200 принятых событий
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: stream:write. Для POST нужен X-CSRF-Token.'
+  /api/stream/control:
+    post:
+      summary: Запустить, приостановить или пошагово воспроизвести
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: stream:write. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StreamControl'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/registry/changes:
+    get:
+      summary: Последние 200 изменений реестра
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: registry:sync. Для POST нужен X-CSRF-Token.'
+  /api/registry/sync:
+    post:
+      summary: Сверить локальный CSV; заглушка API реестра
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: registry:sync. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Empty'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/audit:
+    get:
+      summary: Журнал действий и целостность цепочки
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: audit:read. Для POST нужен X-CSRF-Token.'
+  /api/roles:
+    get:
+      summary: Каталог прав, роли, учетные записи
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: roles:manage. Для POST нужен X-CSRF-Token.'
+    post:
+      summary: Создать или обновить роль
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: roles:manage. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Role'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/users:
+    post:
+      summary: Создать или обновить пользователя
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: roles:manage. Для POST нужен X-CSRF-Token.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      parameters:
+      - name: X-CSRF-Token
+        in: header
+        required: true
+        schema:
+          type: string
+  /api/report/options:
+    get:
+      summary: Системы для фильтра отчета
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: reports:read. Для POST нужен X-CSRF-Token.'
+  /api/reports:
+    get:
+      summary: Сформировать отчет
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: object
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: reports:read. Для POST нужен X-CSRF-Token.'
+      parameters:
+      - &id002
+        name: kind
+        in: query
+        required: false
+        description: management, forecast, activity, quality, audit
+        schema:
+          type: string
+      - &id003
+        name: from
+        in: query
+        required: false
+        description: YYYY-MM-DD
+        schema:
+          type: string
+      - &id004
+        name: to
+        in: query
+        required: false
+        description: YYYY-MM-DD
+        schema:
+          type: string
+      - &id005
+        name: object_id
+        in: query
+        required: false
+        description: ''
+        schema:
+          type: integer
+      - &id006
+        name: system
+        in: query
+        required: false
+        description: ''
+        schema:
+          type: string
+      - &id007
+        name: status
+        in: query
+        required: false
+        description: ''
+        schema:
+          type: string
+      - &id008
+        name: min_score
+        in: query
+        required: false
+        description: 0–100 процентов
+        schema:
+          type: number
+  /api/reports.xlsx:
+    get:
+      summary: Сформировать отчет и выгрузить .xlsx
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: reports:read. Для POST нужен X-CSRF-Token.'
+      parameters:
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+      - *id006
+      - *id007
+      - *id008
+  /api/reports.pdf:
+    get:
+      summary: Сформировать отчет и выгрузить .pdf
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400': *id001
+        '401': *id001
+        '403': *id001
+      security:
+      - demoCookie: []
+      description: 'Право: reports:read. Для POST нужен X-CSRF-Token.'
+      parameters:
+      - *id002
+      - *id003
+      - *id004
+      - *id005
+      - *id006
+      - *id007
+      - *id008
+components:
+  securitySchemes:
+    demoCookie:
+      type: apiKey
+      in: cookie
+      name: demo_session
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+      additionalProperties: true
+      required:
+      - error
+    Empty:
+      type: object
+      additionalProperties: false
+    Login:
+      type: object
+      properties:
+        user:
+          type: string
+        password:
+          type: string
+      additionalProperties: true
+      required:
+      - user
+      - password
+    ObjectCreate:
+      type: object
+      properties:
+        parent_id:
+          type: integer
+        name:
+          type: string
+      additionalProperties: true
+      required:
+      - parent_id
+      - name
+    EquipmentCreate:
+      type: object
+      properties:
+        object_id:
+          type: integer
+        system_name:
+          type: string
+        sensor_type:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
+      required:
+      - object_id
+      - system_name
+      - sensor_type
+      - name
+    DecisionCreate:
+      type: object
+      properties:
+        object_id:
+          type: integer
+        category:
+          type: string
+        decision:
+          type: string
+        reason:
+          type: string
+      additionalProperties: true
+      required:
+      - object_id
+      - category
+      - decision
+      - reason
+    TicketDraft:
+      type: object
+      properties:
+        object_id:
+          type: integer
+        equipment:
+          type: string
+        reason:
+          type: string
+        priority:
+          type: string
+        due_at:
+          type: string
+      additionalProperties: true
+      required:
+      - object_id
+      - equipment
+      - reason
+      - priority
+      - due_at
+    Confirmation:
+      type: object
+      properties:
+        confirm:
+          type: boolean
+      additionalProperties: true
+      required:
+      - confirm
+    StreamControl:
+      type: object
+      properties:
+        command:
+          type: string
+        speed:
+          type: number
+        count:
+          type: integer
+      additionalProperties: true
+      required:
+      - command
+    Role:
+      type: object
+      properties:
+        role_id:
+          type: string
+        title:
+          type: string
+        permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - role_id
+      - title
+      - permissions
+    User:
+      type: object
+      properties:
+        user_id:
+          type: string
+        role_id:
+          type: string
+        password:
+          type: string
+      additionalProperties: true
+      required:
+      - user_id
+      - role_id
