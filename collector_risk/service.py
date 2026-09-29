@@ -181,8 +181,8 @@ class Store:
         if session:
             self.audit(session[0], 'logout', 'ok')
 
-    def allowed(self, actor, permission):
-        """Разрешает действие только при наличии права у текущей роли."""
+    def allowed(self, actor, permission, object_id=None):
+        """Проверяет право роли; ограничение по object_id пока не настроено в демо."""
         return bool(actor and permission in self.permissions(actor))
 
     def permissions(self, actor):
