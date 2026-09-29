@@ -1,0 +1,8 @@
+meta:
+  environment: python
+  toolchain:
+    name: pip
+
+run:
+  command: python3 -m collector_risk.server --artifacts artifacts --objects upload/справочник_объектов_диспетчер.csv --host 0.0.0.0 --port 8080
+  containerPort: 8080
