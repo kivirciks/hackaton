@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Коллектор · Рабочее место</title><link rel="stylesheet" href="/app.css"></head><body>
+<aside class="rail"><div class="logo">К<span>●</span></div><nav aria-label="Разделы">
+  <button data-page="dashboard">Прогнозы</button><button data-page="stream">Поступление данных</button>
+  <button data-page="map">Схема</button><button data-page="tree">Оборудование</button>
+  <button data-page="reports">Отчеты</button><button data-page="roles">Роли и доступ</button></nav><div class="rail-bottom">24<span>ч</span></div></aside>
+<main><header><div><div class="eyebrow">АО «МОСКОЛЛЕКТОР» / ИСТОРИЧЕСКАЯ ДЕМОНСТРАЦИЯ</div>
+  <h1 id="page-title">Прогнозы по объектам</h1><p class="muted" id="subtitle">Новый тревожный сигнал в следующие календарные сутки</p></div>
+  <div class="header-right"><span class="live"><i></i><b id="identity">Нет входа</b></span><button id="logout" class="secondary">Выйти</button></div></header>
+<div id="notice" class="notice" hidden></div>
+<section id="login-page" class="workspace login-panel"><div class="section-head"><div><div class="eyebrow">ЛОКАЛЬНОЕ ДЕМО</div>
+  <h2>Войти в рабочее место</h2><p>Стартовые учетные записи: <code>dispatcher</code> и системный <code>admin</code>, пароль <code>demo</code>. Администратор создает дополнительные роли и сотрудников.</p></div></div>
+  <form id="login-form" class="form-grid"><label>Логин<input id="login-user" value="dispatcher" required autocomplete="username"></label>
+  <label>Пароль<input id="login-password" type="password" value="demo" required></label><button class="primary">Войти</button><p id="login-message" aria-live="polite"></p></form></section>
+<div id="application" hidden>
+  <section id="dashboard-page" class="page">
+    <div class="cards three"><article><span>Объектов с наблюдениями</span><strong id="objects">—</strong><small>В загруженном прогнозе</small></article>
+      <article><span>Инженерных систем</span><strong id="systems-count">—</strong><small>По категориям модели</small></article>
+      <article><span>Проблемы с данными</span><strong id="data-gap">—</strong><small>Пары объект/система без свежих или достаточных записей</small></article></div>
+    <section class="workspace section-pad"><div class="section-head tight"><h2>Сводка по системам</h2></div>
+      <p class="muted">Каждая карточка — одна инженерная система. Нажмите ее, чтобы показать соответствующие строки таблицы.</p><div id="system-summary" class="system-summary"></div></section>
+    <section class="workspace"><div class="section-head filters-head"><h2>Прогнозы</h2></div>
+      <details class="legend-details" open><summary>Что означают статусы и показатели?</summary><div class="legend-grid">
+        <p><b class="red-dot">● Активный сигнал</b> — датчик сообщил о тревоге на дату наблюдения. Требует проверки; поломка не подтверждена.</p>
+        <p><b class="orange-dot">● Проверить</b> — модель прогнозирует новый сигнал в следующие сутки выше выбранного порога.</p>
+        <p><b class="gray-dot">● Нет свежих данных</b> — записи не поступили на последнюю дату выгрузки. Это отдельный повод проверить связь или датчик.</p>
+        <p><b class="gray-dot">● Мало данных</b> — наблюдений недостаточно для надежного вывода.</p>
+        <p><b class="green-dot">● Наблюдение</b> — при имеющихся данных порог проверки не достигнут; это не гарантия исправности.</p></div></details>
+      <div class="forecast-filter-row"><label>Объект<select id="object-filter"><option value="">Все объекты</option></select></label>
+        <label>Система<select id="type"><option value="">Все системы</option></select></label>
+        <label>Статус<select id="status"><option value="">Все статусы</option><option>Активный сигнал</option><option>Проверить</option><option>Нет свежих данных</option><option>Мало данных</option><option>Наблюдение</option></select></label>
+        <label>Прогноз от, %<input id="min-score" type="number" min="0" max="100" step="1" placeholder="Любой"></label>
+        <label>Поиск<input id="search" placeholder="Название или ID"></label></div>
+      <div class="table-wrap"><table><thead><tr><th>Объект</th><th>Система</th><th><span title="Прогноз — вероятность нового тревожного дня. Прочерк означает, что оценку не следует интерпретировать при активном сигнале или недостатке данных.">Прогноз ⓘ</span></th><th><span title="Сигналы за 7 дней — сумма тревожных записей за последние семь календарных дней по объекту и системе, не число аварий.">Сигналы за 7 дней ⓘ</span></th><th>Статус</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+      <div class="table-footer"><span id="count"></span><span>Выберите строку для карточки →</span></div></section>
+    <section class="workspace section-pad"><h2>Поступившие оповещения</h2><p class="muted">Оповещения появляются при воспроизведении исторических событий. «Отмечено как просмотренное» означает, что диспетчер подтвердил просмотр, а не исправление оборудования.</p><div id="notification-list"></div></section>
+  </section>
+  <section id="stream-page" class="page" hidden><section class="workspace section-pad"><h2>Как работает демонстрация поступления данных</h2>
+    <ol class="steps"><li>Берем последние семь доступных дней из исторического журнала, уже сведенного по объекту и системе.</li>
+      <li>Показываем эти записи постепенно, словно они только что поступили. В карточке остаются две даты: исходная и время демонстрационного приема.</li>
+      <li>Если запись содержит тревогу, появляется оповещение. Это показ маршрута данных, не поток с реальных датчиков.</li></ol>
+    <p class="warning">Страница доступна только администратору. Данные здесь исторические.</p>
+    <div class="filters"><button id="stream-start" class="primary">▶ Воспроизвести</button><button id="stream-step" class="secondary">Показать 10 записей</button><button id="stream-pause" class="secondary">Пауза</button></div>
+    <p id="stream-state" aria-live="polite"></p><h3>Последние принятые записи</h3><div id="stream-events" class="event-list"></div></section></section>
+  <section id="map-page" class="page" hidden><section class="workspace section-pad"><h2>Схема площадок и объектов</h2>
+    <div class="risk-legend"><span><i class="red-bg"></i>Есть тревожный сигнал — проверить</span><span><i class="orange-bg"></i>Прогноз выше порога</span><span><i class="green-bg"></i>Данные есть, порог не достигнут</span><span><i class="gray-bg"></i>Нет свежих или достаточно полных данных</span></div>
+    <p class="warning">Элементы одной площадки расположены рядом по связи «родитель — объект». Если в названии есть ПК, участки упорядочены по его номеру. Стороны света, расстояния и адреса в исходных данных отсутствуют; компоновка условная.</p>
+    <div class="filters"><label>Система<select id="map-category"><option value="">Все системы</option></select></label><label>Состояние<select id="map-risk"><option value="">Все состояния</option><option value="alarm">Есть сигнал</option><option value="risk">Прогноз выше порога</option><option value="normal">Наблюдение</option><option value="missing">Нет/мало данных</option></select></label></div>
+    <div id="map-canvas" class="map-canvas" aria-label="Схема групп объектов по площадкам"></div><p id="map-count"></p></section></section>
+  <section id="tree-page" class="page" hidden><section class="workspace section-pad"><h2>Объекты и оборудование</h2>
+    <p class="muted">Раскройте район и объект слева; справа появятся каналы и датчики выбранного объекта. Это справочник каналов, не паспорт выполненных ремонтов.</p>
+    <div class="registry-layout"><div class="registry-sidebar"><label>Найти объект или ID<input id="tree-search" placeholder="Название или ID"></label><div class="filters"><button id="tree-expand" class="secondary">Развернуть все</button><button id="tree-collapse" class="secondary">Свернуть все</button></div><div id="tree-list" class="tree-list"></div></div>
+    <div class="registry-detail"><div id="equipment-placeholder" class="empty-state">Выберите объект в дереве слева</div><div id="equipment-panel" hidden><h3 id="equipment-title"></h3>
+      <div class="filters"><label>Система<select id="equipment-system"><option value="">Все системы</option></select></label><label>Поиск датчика<input id="equipment-search" placeholder="Название, тип или ID канала"></label></div>
+      <p id="equipment-count" class="muted"></p><div id="equipment-list" class="event-list equipment-list"></div>
+      <details id="equipment-add" hidden><summary>Добавить оборудование локально</summary><form id="equipment-form" class="form-grid"><label>Система<input id="eq-system" required placeholder="Как в справочнике"></label><label>Тип датчика<input id="eq-type" required></label><label>Название<input id="eq-name" required></label><button class="primary">Добавить</button><p id="equipment-message"></p></form></details></div></div></div>
+    <details id="object-add" hidden><summary>Добавить объект локально</summary><form id="object-form" class="form-grid"><label>ID родителя<input id="parent-id" type="number" required></label><label>Название<input id="new-name" required maxlength="120"></label><button class="primary">Добавить</button><p id="object-message" aria-live="polite"></p></form></details>
+    <button id="registry-sync" class="secondary" hidden>Сверить с локальным CSV (заглушка API реестра)</button></section></section>
+  <section id="reports-page" class="page" hidden><section class="workspace section-pad"><h2>Сформировать отчет</h2>
+    <p class="muted">Выберите вид и параметры. Экран, PDF и Excel строятся из одного среза. Даты относятся к созданию локальных записей; прогноз — исторический снимок и не пересчитывается за выбранный период.</p>
+    <div class="report-form"><label>Вид отчета<select id="report-kind"><option value="management">Управленческая сводка</option><option value="forecast">Прогнозы по объектам</option><option value="activity">Оповещения и решения</option><option value="quality">Качество данных</option><option value="audit">Журнал действий</option></select></label>
+      <label>С <input id="report-from" type="date"></label><label>По <input id="report-to" type="date"></label>
+      <label>Объект ID <input id="report-object" type="number" min="1" placeholder="Все"></label>
+      <label>Система<select id="report-system"><option value="">Все системы</option></select></label>
+      <label>Статус<select id="report-status"><option value="">Все статусы</option><option>Активный сигнал</option><option>Проверить</option><option>Нет свежих данных</option><option>Мало данных</option><option>Наблюдение</option></select></label>
+      <label>Прогноз от, %<input id="report-min-score" type="number" min="0" max="100" step="1" placeholder="Любой"></label></div>
+    <p id="report-help" class="muted"></p><div class="filters"><button id="report-run" class="primary">Сформировать</button><button id="report-xlsx" class="secondary">Скачать Excel</button><button id="report-pdf" class="secondary">Скачать PDF</button></div>
+    <div id="report-output" aria-live="polite"></div></section></section>
+  <section id="roles-page" class="page" hidden><section class="workspace section-pad"><h2>Роли и доступ</h2>
+    <p class="warning">Только администратор меняет права. Встроенный системный администратор неизменяем; роль диспетчера создается при первом запуске. Остальные роли и логины создаются здесь. Это локальное демо без корпоративного IdP.</p>
+    <div class="role-layout"><div><h3>Роли</h3><div id="roles-list"></div><form id="role-form" class="form-grid">
+      <label>Код роли латиницей<input id="role-id" required pattern="[a-z][a-z0-9_]{1,31}" placeholder="auditor"></label>
+      <label>Название<input id="role-title" required placeholder="Аудитор"></label><fieldset><legend>Разрешения</legend><div id="permission-list" class="permission-list"></div></fieldset>
+      <button class="primary">Сохранить роль</button><p id="role-message" aria-live="polite"></p></form></div>
+    <div><h3>Учетные записи</h3><div id="users-list"></div><form id="user-form" class="form-grid">
+      <label>Логин<input id="new-user-id" required pattern="[a-z][a-z0-9_]{1,31}" placeholder="operator_1"></label>
+      <label>Роль<select id="new-user-role"></select></label><label>Пароль<input id="new-user-password" type="password" placeholder="Для новой записи обязателен"></label>
+      <button class="primary">Сохранить учетную запись</button><p id="user-message" aria-live="polite"></p></form></div></div></section></section>
+</div><footer>Локальный прототип · решение о ремонте принимает человек · внешняя система заявок не подключена</footer></main>
+<div id="overlay" class="overlay" hidden><div class="shade" id="shade"></div><section class="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+<button class="close" id="close" aria-label="Закрыть">×</button><div class="eyebrow">КАРТОЧКА ОБЪЕКТА</div><h2 id="drawer-title"></h2><div id="detail"></div>
+<div id="decision-section" class="workflow-step"><h3>1. Зафиксировать решение <span title="Запись в журнале диспетчера: что проверять и почему. Заявка на работы не создается.">ⓘ</span></h3><p class="muted">Выберите действие и сохраните основание. Это запись для диспетчерского журнала, она не создает заявку на ремонт.</p><form id="decision"><label>Действие<select id="action"><option value="проверка">Проверка</option><option value="наблюдение">Наблюдение</option><option value="выезд">Выезд</option><option value="ложное срабатывание">Ложное срабатывание</option></select></label><label>Основание<textarea id="reason" maxlength="500" required placeholder="Почему принято это решение?"></textarea></label><button class="primary">Сохранить решение в журнале</button></form></div>
+<div id="ticket-section" class="workflow-step"><h3>2. При необходимости подготовить заявку <span title="Черновик описывает работу: объект, оборудование, причина, приоритет и срок. После отдельного подтверждения она остается локальной.">ⓘ</span></h3><p class="muted">Создайте отдельный черновик на работы. Он не зависит от записи решения выше.</p><p class="warning">Внешняя отправка отключена; подтверждение сохраняется только локально.</p><form id="ticket-form"><label>Объект ID<input id="ticket-object" readonly></label><label>Оборудование<input id="equipment" required placeholder="Уточнить по паспорту"></label><label>Причина<textarea id="ticket-reason" required></textarea></label><label>Приоритет<select id="ticket-priority"><option>обычный</option><option>высокий</option><option>критический</option></select></label><label>Срок<input id="ticket-due" type="date" required></label><button class="primary">Сохранить черновик заявки</button></form><button id="ticket-confirm" class="secondary" hidden>Подтвердить черновик человеком</button><div class="filters"><input id="ticket-id" placeholder="ID заявки" aria-label="ID заявки"><button id="ticket-check" class="secondary">Проверить статус</button></div><p id="ticket-status"></p></div><p id="message" aria-live="polite"></p></section></div>
+<script src="/app.js"></script></body></html>
