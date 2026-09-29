@@ -1,0 +1,7 @@
+{
+  "events": 857,
+  "notifications": 220,
+  "processing_p95_s": 0.0,
+  "delivery_poll_interval_s": 5,
+  "scope": "local replay; source timestamps historical, target ingest/queue network not measured"
+}

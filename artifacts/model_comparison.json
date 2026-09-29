@@ -1,0 +1,33 @@
+{
+  "split": {
+    "train": 33432,
+    "validation": 2157,
+    "test": 2155
+  },
+  "validation": {
+    "base": {
+      "average_precision": 0.443089512138109,
+      "precision": 0.46153846153846156,
+      "recall": 0.463519313304721,
+      "threshold": 0.31157421932510915
+    },
+    "context": {
+      "average_precision": 0.4373454856559677,
+      "precision": 0.46382978723404256,
+      "recall": 0.4678111587982833,
+      "threshold": 0.28797876540185685
+    },
+    "extra_trees": {
+      "average_precision": 0.43110091099509806,
+      "precision": 0.4553191489361702,
+      "recall": 0.4592274678111588,
+      "threshold": 0.29356928306544683
+    },
+    "selected_ensemble": {
+      "average_precision": 0.4475862949227575,
+      "precision": 0.48068669527896996,
+      "recall": 0.48068669527896996,
+      "threshold": 0.3079514470829151
+    }
+  }
+}

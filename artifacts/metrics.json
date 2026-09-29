@@ -1,0 +1,93 @@
+{
+  "target": "First alarm day within the next calendar day, among object/system days without an active alarm",
+  "horizon": "Next calendar day (up to 48h for an early-day observation; daily batch at 23:59 gives 24h)",
+  "data_end": "2026-06-29",
+  "train_end": "2026-05-04",
+  "validation_start": "2026-05-05",
+  "test_start": "2026-06-02",
+  "train_rows": 33432,
+  "validation_rows": 2157,
+  "test_rows": 2155,
+  "train_positives": 3527,
+  "validation_positives": 233,
+  "test_positives": 249,
+  "prevalence": 0.11554524361948956,
+  "average_precision": 0.45639349264531787,
+  "baseline_ap_7d_alarm": 0.2770612805175498,
+  "roc_auc": 0.8813817705238584,
+  "brier": 0.07992033777559547,
+  "threshold_raw": 0.3079514470829151,
+  "threshold_calibrated": 0.19133574007220217,
+  "selection_policy": "Maximize min(precision, recall) on validation; blend 0.75 base + 0.25 context",
+  "validation_precision": 0.48068669527896996,
+  "validation_recall": 0.48068669527896996,
+  "alert_precision": 0.4581818181818182,
+  "alert_recall": 0.5060240963855421,
+  "alerts": 275,
+  "test_onsets": 249,
+  "by_category": {
+    "access": {
+      "rows": 372,
+      "onsets": 88,
+      "alerts": 142,
+      "precision": 0.45774647887323944,
+      "average_precision": 0.47703030965850013
+    },
+    "fire": {
+      "rows": 18,
+      "onsets": 7,
+      "alerts": 9,
+      "precision": 0.5555555555555556,
+      "average_precision": 0.5779645191409897
+    },
+    "flood": {
+      "rows": 1,
+      "onsets": 1,
+      "alerts": 1,
+      "precision": 1.0,
+      "average_precision": 1.0
+    },
+    "gas": {
+      "rows": 303,
+      "onsets": 6,
+      "alerts": 0,
+      "precision": null,
+      "average_precision": 0.04771491059125473
+    },
+    "power": {
+      "rows": 212,
+      "onsets": 43,
+      "alerts": 25,
+      "precision": 0.44,
+      "average_precision": 0.3550663946771126
+    },
+    "pump": {
+      "rows": 260,
+      "onsets": 65,
+      "alerts": 55,
+      "precision": 0.509090909090909,
+      "average_precision": 0.41900048476556045
+    },
+    "thermal": {
+      "rows": 492,
+      "onsets": 6,
+      "alerts": 0,
+      "precision": null,
+      "average_precision": 0.08046362159803114
+    },
+    "utilities": {
+      "rows": 300,
+      "onsets": 1,
+      "alerts": 0,
+      "precision": null,
+      "average_precision": 0.0033333333333333335
+    },
+    "ventilation": {
+      "rows": 197,
+      "onsets": 32,
+      "alerts": 43,
+      "precision": 0.37209302325581395,
+      "average_precision": 0.3578172716879211
+    }
+  }
+}

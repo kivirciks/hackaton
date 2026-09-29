@@ -1,0 +1,30 @@
+{
+  "rows": 86237186,
+  "mapped_rows": 86236533,
+  "alarm_rows": 451762,
+  "files": [
+    {
+      "name": "ext-journal-2025.7z",
+      "seconds": 169.0
+    },
+    {
+      "name": "ext-journal-2026.7z",
+      "seconds": 96.0
+    }
+  ],
+  "daily_rows": 61941,
+  "date_min": "2025-01-01",
+  "date_max": "2026-06-30",
+  "objects": 78,
+  "categories": {
+    "access": 15111,
+    "thermal": 10979,
+    "power": 8282,
+    "pump": 6782,
+    "gas": 6573,
+    "utilities": 6341,
+    "ventilation": 4502,
+    "fire": 3026,
+    "flood": 345
+  }
+}
